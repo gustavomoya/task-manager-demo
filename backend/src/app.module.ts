@@ -3,6 +3,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import {TypeOrmModule} from "@nestjs/typeorm";
+import { TasksModule } from './tasks/tasks.module.js';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -24,6 +25,7 @@ import {TypeOrmModule} from "@nestjs/typeorm";
         logging: ['query', 'error'],
       }),
     }),
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
