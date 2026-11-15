@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Task } from './entities/task.entity.js';
+import {Task, TaskStatus} from './entities/task.entity.js';
 import { Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 
@@ -13,9 +13,16 @@ export class TasksService {
 
   /**
    * Find all tasks
+   *
+   * @param status optional filter parameter
    */
-  async findAll(): Promise<Task[]> {
-    return this.tasksRepository.find();
+  async findAll(status?: TaskStatus): Promise<Task[]> {
+    return this.tasksRepository.find({
+      where: status ? { status } : {},
+      order: {
+        createdAt: 'DESC',
+      },
+    });
   }
 
   /**
