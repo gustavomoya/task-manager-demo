@@ -17,9 +17,7 @@ export default new DataSource({
 
   entities: [resolve(process.cwd(), 'src/**/*.entity{.ts,.js}')],
 
-  migrations: [
-    resolve(process.cwd(), 'src/database/migrations/*{.ts,.js}'),
-  ],
+  migrations: [resolve(process.cwd(), 'src/database/migrations/*{.ts,.js}')],
 
   synchronize: false,
 });

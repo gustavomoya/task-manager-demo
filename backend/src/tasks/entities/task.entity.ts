@@ -1,4 +1,11 @@
-import {Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn, Index} from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  CreateDateColumn,
+  Index,
+} from 'typeorm';
 
 export enum TaskStatus {
   PENDING = 'pending',

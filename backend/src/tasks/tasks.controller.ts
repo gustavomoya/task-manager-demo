@@ -1,9 +1,18 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { TasksService } from './tasks.service.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { Task } from './entities/task.entity.js';
-import {FindTasksDto} from "./dto/find-tasks.dto.js";
-import {UpdateTaskStatusDto} from "./dto/update-task-status.dto.js";
+import { FindTasksDto } from './dto/find-tasks.dto.js';
+import { UpdateTaskStatusDto } from './dto/update-task-status.dto.js';
 
 @Controller('tasks')
 export class TasksController {
@@ -21,9 +30,9 @@ export class TasksController {
 
   @Patch(':id/status')
   updateStatus(
-      @Param('id', ParseIntPipe) id: number,
-      @Body() updateTaskStatusDto: UpdateTaskStatusDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateTaskStatusDto: UpdateTaskStatusDto,
   ): Promise<Task> {
-    return this.tasksService.updateStatus(id, updateTaskStatusDto.status,);
+    return this.tasksService.updateStatus(id, updateTaskStatusDto.status);
   }
 }
