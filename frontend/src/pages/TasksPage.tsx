@@ -11,6 +11,7 @@ import {
 } from '../services/tasks.service';
 import type { Task, TaskStatus } from '../types/task';
 import TaskStats from '../components/tasks/TaskStats';
+import TaskFilter, { type TaskFilterValue } from '../components/tasks/TaskFilter';
 
 function getErrorMessage(error: unknown, fallback: string): string {
     return error instanceof ApiError ? error.message : fallback;
@@ -18,6 +19,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
 
 function TasksPage() {
     const [tasks, setTasks] = useState<Task[]>([]);
+    const [filter, setFilter] = useState<TaskFilterValue>('all');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -76,6 +78,14 @@ function TasksPage() {
         [tasks],
     );
 
+    const filteredTasks = useMemo(
+        () =>
+            filter === 'all'
+                ? tasks
+                : tasks.filter((task) => task.status === filter),
+        [tasks, filter],
+    );
+
     const handleStatusChange = async (
         task: Task,
         nextStatus: TaskStatus,
@@ -92,7 +102,7 @@ function TasksPage() {
         setTasks((current) =>
             current.map((item) =>
                 item.id === task.id
-                    ? { ...item, status: nextStatus }
+                    ? {...item, status: nextStatus}
                     : item,
             ),
         );
@@ -118,7 +128,7 @@ function TasksPage() {
             setTasks((current) =>
                 current.map((item) =>
                     item.id === task.id
-                        ? { ...item, status: task.status }
+                        ? {...item, status: task.status}
                         : item,
                 ),
             );
@@ -146,13 +156,20 @@ function TasksPage() {
                 </p>
             </div>
 
-            <TaskStats counts={counts} />
+            <TaskStats counts={counts}/>
+
+            <div className="mt-6">
+                <TaskFilter
+                    value={filter}
+                    onChange={setFilter}
+                />
+            </div>
 
             <div className="mt-6 space-y-4">
                 {success && (
                     <div
                         role="status"
-                        className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800"
+                        className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
                     >
                         {success}
                     </div>
@@ -161,14 +178,14 @@ function TasksPage() {
                 {!isLoading && error && (
                     <div
                         role="alert"
-                        className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                        className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
                     >
                         <span>{error}</span>
 
                         <button
                             type="button"
-                            onClick={handleRetry}
-                            className="rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-red-700 ring-1 ring-inset ring-red-200 transition hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            onClick={() => void fetchTasks()}
+                            className="font-semibold underline"
                         >
                             Retry
                         </button>
@@ -177,62 +194,57 @@ function TasksPage() {
 
                 {isLoading && (
                     <div
-                        className="space-y-3"
                         role="status"
+                        className="space-y-3"
                         aria-label="Loading tasks"
                     >
-                        <span className="sr-only">Loading tasks</span>
-
-                        {[0, 1, 2].map((item) => (
+                        {[1, 2, 3].map((item) => (
                             <div
                                 key={item}
-                                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-                            >
-                                <div className="h-4 w-1/3 animate-pulse rounded bg-slate-200" />
-                                <div className="mt-3 h-3 w-1/4 animate-pulse rounded bg-slate-100" />
-                            </div>
+                                className="h-24 animate-pulse rounded-xl border border-slate-200 bg-white"
+                            />
                         ))}
                     </div>
                 )}
 
                 {!isLoading && !error && tasks.length === 0 && (
                     <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
-                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-600 ring-1 ring-inset ring-blue-100">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="h-6 w-6"
-                                aria-hidden="true"
-                            >
-                                <path d="M9 4h6a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" />
-                                <path d="M9 9h6M9 13h6M9 17h3" />
-                            </svg>
-                        </div>
-
-                        <h3 className="mt-4 text-base font-semibold text-slate-900">
+                        <h3 className="text-base font-semibold text-slate-900">
                             No tasks yet
                         </h3>
 
                         <p className="mt-1 text-sm text-slate-500">
-                            Create your first task to get started.
+                            Get started by creating your first task.
                         </p>
 
                         <Link
                             to="/tasks/new"
-                            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                            className="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
                         >
-                            Create task
+                            Create your first task
                         </Link>
                     </div>
                 )}
 
-                {!isLoading && tasks.length > 0 && (
+                {!isLoading &&
+                    !error &&
+                    tasks.length > 0 &&
+                    filteredTasks.length === 0 && (
+                        <div
+                            className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center">
+                            <h3 className="text-base font-semibold text-slate-900">
+                                No tasks found
+                            </h3>
+
+                            <p className="mt-1 text-sm text-slate-500">
+                                There are no tasks with this status.
+                            </p>
+                        </div>
+                    )}
+
+                {!isLoading && !error && filteredTasks.length > 0 && (
                     <div className="space-y-3">
-                        {tasks.map((task) => (
+                        {filteredTasks.map((task) => (
                             <TaskItem
                                 key={task.id}
                                 task={task}
