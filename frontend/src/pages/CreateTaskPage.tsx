@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import type { Task } from '../types/task';
+import TaskForm from "../components/tasks/TaskForm.tsx";
 
 function CreateTaskPage() {
   const navigate = useNavigate();
 
   const handleTaskCreated = (task: Task) => {
-    console.log('Task created:', task);
     navigate('/');
   };
 
@@ -20,6 +20,8 @@ function CreateTaskPage() {
           Add a new task to your team's workload.
         </p>
       </div>
+
+      <TaskForm onTaskCreated={handleTaskCreated} />
 
     </section>
   );
