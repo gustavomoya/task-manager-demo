@@ -312,7 +312,7 @@ El proyecto cubre las funcionalidades principales que se definieron para el MVP.
 ## Cómo usé la IA
 
 Durante el desarrollo utilicé principalmente OpenCode como asistente de programación, complementándolo con GitHub Copilot para definir los requisitos, revisar alternativas,
-gilizar algunas tareas de implementación, resolver dudas técnicas y revisar código.
+agilizar algunas tareas de implementación, resolver dudas técnicas y revisar código.
 
 ### Qué le pedí
 
