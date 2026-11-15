@@ -20,7 +20,9 @@
     "test:cov": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
-    "typeorm": "typeorm-ts-node-esm"
+    "typeorm": "typeorm-ts-node-esm",
+    "db:test:create": "node scripts/ensure-test-database.mjs",
+    "db:test:migrate": "typeorm-ts-node-esm migration:run -d test/e2e-data-source.ts"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
