@@ -80,4 +80,35 @@ describe('TasksController (e2e)', () => {
         .expect(400);
     });
   });
+
+  describe('GET /tasks', () => {
+    it('should return all tasks', async () => {
+      await request(app.getHttpServer())
+        .post('/tasks')
+        .send({
+          title: 'Implement tasks API',
+          assignee: 'John',
+        })
+        .expect(201);
+
+      const response = await request(app.getHttpServer())
+        .get('/tasks')
+        .expect(200);
+
+      expect(response.body).toHaveLength(1);
+      expect(response.body[0]).toMatchObject({
+        title: 'Implement tasks API',
+        assignee: 'John',
+        status: 'pending',
+      });
+    });
+
+    it('should return an empty array when there are no tasks', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/tasks')
+        .expect(200);
+
+      expect(response.body).toEqual([]);
+    });
+  });
 });

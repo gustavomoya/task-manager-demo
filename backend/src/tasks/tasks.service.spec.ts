@@ -11,6 +11,7 @@ describe('TasksService', () => {
   const tasksRepositoryMock = {
     create: vi.fn(),
     save: vi.fn(),
+    find: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -53,6 +54,37 @@ describe('TasksService', () => {
       expect(tasksRepositoryMock.create).toHaveBeenCalledWith(createTaskDto);
       expect(tasksRepositoryMock.save).toHaveBeenCalledWith(task);
       expect(result).toEqual(task);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all tasks', async () => {
+      const tasks: Task[] = [
+        {
+          id: 1,
+          title: 'Implement tasks API',
+          status: TaskStatus.PENDING,
+          assignee: 'Gustavo',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 2,
+          title: 'Write unit tests',
+          status: TaskStatus.IN_PROGRESS,
+          assignee: 'Gustavo',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      tasksRepositoryMock.find.mockResolvedValue(tasks);
+
+      const result = await service.findAll();
+
+      expect(tasksRepositoryMock.find).toHaveBeenCalled();
+      expect(result).toEqual(tasks);
+      expect(result).toHaveLength(2);
     });
   });
 });
