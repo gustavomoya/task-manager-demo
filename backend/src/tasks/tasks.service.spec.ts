@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TasksService } from './tasks.service.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { Task, TaskStatus } from './entities/task.entity.js';
+import { NotFoundException } from '@nestjs/common';
 
 describe('TasksService', () => {
   let service: TasksService;
@@ -12,6 +13,7 @@ describe('TasksService', () => {
     create: vi.fn(),
     save: vi.fn(),
     find: vi.fn(),
+    findOneBy: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -85,6 +87,42 @@ describe('TasksService', () => {
       expect(tasksRepositoryMock.find).toHaveBeenCalled();
       expect(result).toEqual(tasks);
       expect(result).toHaveLength(2);
+    });
+  });
+
+  describe('updateStatus', () => {
+    it('should update a task status successfully', async () => {
+      const task: Task = {
+        id: 1,
+        title: 'Implement tasks API',
+        status: TaskStatus.PENDING,
+        assignee: 'John',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      tasksRepositoryMock.findOneBy.mockResolvedValue(task);
+      tasksRepositoryMock.save.mockResolvedValue(task);
+
+      const result = await service.updateStatus(1, TaskStatus.IN_PROGRESS);
+
+      expect(tasksRepositoryMock.findOneBy).toHaveBeenCalledWith({
+        id: 1,
+      });
+
+      expect(task.status).toBe(TaskStatus.IN_PROGRESS);
+      expect(tasksRepositoryMock.save).toHaveBeenCalledWith(task);
+      expect(result.status).toBe(TaskStatus.IN_PROGRESS);
+    });
+
+    it('should throw NotFoundException when task does not exist', async () => {
+      tasksRepositoryMock.findOneBy.mockResolvedValue(null);
+
+      await expect(service.updateStatus(999, TaskStatus.DONE)).rejects.toThrow(
+        NotFoundException,
+      );
+
+      expect(tasksRepositoryMock.save).not.toHaveBeenCalled();
     });
   });
 });

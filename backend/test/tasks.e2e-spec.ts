@@ -111,4 +111,123 @@ describe('TasksController (e2e)', () => {
       expect(response.body).toEqual([]);
     });
   });
+
+  describe('GET /tasks?status', () => {
+    it('should return only tasks with the requested status', async () => {
+      await request(app.getHttpServer())
+        .post('/tasks')
+        .send({
+          title: 'Pending task',
+          assignee: 'John',
+        })
+        .expect(201);
+
+      const taskResponse = await request(app.getHttpServer())
+        .post('/tasks')
+        .send({
+          title: 'Completed task',
+          assignee: 'John',
+        })
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(`/tasks/${taskResponse.body.id}/status`)
+        .send({
+          status: 'done',
+        })
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .get('/tasks?status=pending')
+        .expect(200);
+
+      expect(response.body).toHaveLength(1);
+      expect(response.body[0].title).toBe('Pending task');
+      expect(response.body[0].status).toBe('pending');
+    });
+
+    it('should reject an invalid status filter', async () => {
+      await request(app.getHttpServer())
+        .get('/tasks?status=invalid')
+        .expect(400);
+    });
+  });
+
+  describe('PATCH /tasks/:id/status', () => {
+    it('should update a task status successfully', async () => {
+      const taskResponse = await request(app.getHttpServer())
+        .post('/tasks')
+        .send({
+          title: 'Implement E2E tests',
+          assignee: 'John',
+        })
+        .expect(201);
+
+      const response = await request(app.getHttpServer())
+        .patch(`/tasks/${taskResponse.body.id}/status`)
+        .send({
+          status: 'in_progress',
+        })
+        .expect(200);
+
+      expect(response.body).toMatchObject({
+        id: taskResponse.body.id,
+        title: 'Implement E2E tests',
+        status: 'in_progress',
+      });
+    });
+
+    it('should return 404 when task does not exist', async () => {
+      await request(app.getHttpServer())
+        .patch('/tasks/99999/status')
+        .send({
+          status: 'done',
+        })
+        .expect(404);
+    });
+
+    it('should reject an invalid status', async () => {
+      const taskResponse = await request(app.getHttpServer())
+        .post('/tasks')
+        .send({
+          title: 'Test invalid status',
+          assignee: 'John',
+        })
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(`/tasks/${taskResponse.body.id}/status`)
+        .send({
+          status: 'invalid',
+        })
+        .expect(400);
+    });
+
+    it('should reject a non-numeric task ID', async () => {
+      await request(app.getHttpServer())
+        .patch('/tasks/abc/status')
+        .send({
+          status: 'done',
+        })
+        .expect(400);
+    });
+
+    it('should reject additional fields', async () => {
+      const taskResponse = await request(app.getHttpServer())
+        .post('/tasks')
+        .send({
+          title: 'Test extra fields',
+          assignee: 'John',
+        })
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(`/tasks/${taskResponse.body.id}/status`)
+        .send({
+          status: 'done',
+          title: 'Changed title',
+        })
+        .expect(400);
+    });
+  });
 });
