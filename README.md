@@ -1,0 +1,282 @@
+# Task Manager Demo
+
+Aplicación web de gestión de tareas desarrollada como demo.
+
+El proyecto permite crear tareas, consultar el listado, filtrar por estado y actualizar su progreso. 
+Está construido utilizando una arquitectura frontend/backend independiente y una API REST.
+
+## Tecnologías
+
+### Backend
+- **Node.js**
+- **NestJS**
+- **TypeScript**
+- **PostgreSQL**
+- **TypeORM**
+- **class-validator / class-transformer**
+- **Vitest**
+
+### Frontend
+- **React**
+- **TypeScript**
+- **Vite**
+- **Tailwind CSS**
+- **React Hook Form**
+- **Zod**
+- **React Router**
+- **Vitest**
+- **Testing Library**
+
+### Infraestructura
+- **Docker**
+- **Docker Compose**
+
+## Funcionalidades
+
+- Crear tareas con título y responsable.
+- Consultar todas las tareas.
+- Filtrar tareas por estado.
+- Actualizar el estado de una tarea.
+- Visualizar estadísticas generales de tareas.
+- Validar los datos tanto en frontend como en backend.
+- Gestionar estados de carga, errores y resultados vacíos.
+
+### Estados de las tareas
+
+| Estado | Descripción |
+|---|---|
+| `pending` | Pendiente |
+| `in_progress` | En progreso |
+| `done` | Completada |
+
+## Arquitectura
+
+El proyecto está dividido en dos aplicaciones independientes:
+
+- **Frontend:** interfaz de usuario desarrollada con React.
+- **Backend:** API REST desarrollada con NestJS.
+- **Database:** PostgreSQL como sistema de almacenamiento.
+
+La comunicación entre frontend y backend se realiza mediante HTTP utilizando la Fetch API.
+
+El backend sigue una separación de responsabilidades basada en:
+
+- **Controller:** recibe las solicitudes HTTP y gestiona las respuestas.
+- **Service:** contiene la lógica de negocio.
+- **Repository:** acceso y persistencia de datos mediante TypeORM.
+
+### Estructura del proyecto
+
+```text
+task-manager-demo/
+├── backend/
+│   ├── src/
+│   │   ├── database/
+│   │   │   └── migrations/
+│   │   ├── tasks/
+│   │   │   ├── dto/
+│   │   │   ├── entities/
+│   │   │   ├── tasks.controller.ts
+│   │   │   ├── tasks.service.ts
+│   │   │   └── tasks.module.ts
+│   │   ├── app.module.ts
+│   │   └── main.ts
+│   ├── scripts/
+│   ├── test/
+│   ├── Dockerfile
+│   └── package.json
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   ├── types/
+│   │   └── test/
+│   ├── Dockerfile
+│   └── package.json
+│
+├── .env.example
+├── .gitignore
+└── docker-compose.yml
+```
+
+## Requisitos
+
+Para ejecutar el proyecto mediante Docker se necesita:
+
+- Docker Engine.
+- Docker Compose v2.
+
+No es necesario instalar Node.js, PostgreSQL ni las dependencias de las aplicaciones en la máquina anfitriona.
+
+## Instalación y ejecución
+
+### 1. Clonar el repositorio
+
+```bash
+git clone <REPOSITORY_URL>
+cd task-manager-demo
+```
+
+### 2. Configurar las variables de entorno
+
+Crear el archivo `.env` a partir del ejemplo:
+
+```bash
+cp .env.example .env
+```
+
+El archivo `.env` contiene la configuración local utilizada por Docker Compose.
+
+### 3. Iniciar las aplicaciones
+
+Desde la raíz del proyecto ejecutar:
+
+```bash
+docker compose up --build
+```
+
+Docker Compose se encarga de:
+
+1. Iniciar PostgreSQL.
+2. Esperar a que PostgreSQL esté disponible.
+3. Iniciar el backend.
+4. Crear la base de datos de pruebas si todavía no existe.
+5. Ejecutar las migraciones de la base de pruebas.
+6. Ejecutar las migraciones de la base principal.
+7. Iniciar la API NestJS.
+8. Iniciar el frontend React.
+
+### 4. Acceder a la aplicación
+
+Una vez iniciados los servicios:
+
+| Aplicación | Dirección |
+|---|---|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:3000 |
+| PostgreSQL | localhost:5432 |
+
+### 5. Detener los servicios
+
+```bash
+docker compose down
+```
+
+Este comando detiene y elimina los contenedores, pero conserva los datos de PostgreSQL en el volumen persistente.
+
+Para volver a iniciar:
+
+```bash
+docker compose up
+```
+
+**Importante:** no utilizar `docker compose down -v` salvo que se quiera eliminar también el volumen y perder los datos almacenados.
+
+## API REST
+
+La API expone los siguientes endpoints:
+
+### Crear una tarea
+
+`POST /tasks`
+
+Request:
+
+```json
+{
+  "title": "Implement authentication",
+  "assignee": "John Doe"
+}
+```
+
+El estado inicial se establece automáticamente como `pending`.
+
+### Listar tareas
+
+`GET /tasks`
+
+Devuelve todas las tareas registradas.
+
+### Filtrar tareas por estado
+
+`GET /tasks?status=pending`
+
+Estados permitidos:
+
+- `pending`
+- `in_progress`
+- `done`
+
+### Actualizar el estado de una tarea
+
+`PATCH /tasks/:id/status`
+
+Request:
+
+```json
+{
+  "status": "in_progress"
+}
+```
+
+### Modelo de datos
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id` | Integer | Identificador autoincremental |
+| `title` | Varchar(150) | Título de la tarea |
+| `status` | Enum | Estado de la tarea |
+| `assignee` | Varchar(100) | Responsable |
+| `createdAt` | Timestamp | Fecha de creación |
+| `updatedAt` | Timestamp | Fecha de actualización |
+
+## Validaciones
+
+Las validaciones se realizan tanto en el frontend como en el backend.
+
+- El título es obligatorio y debe contener entre 3 y 150 caracteres.
+- El responsable es obligatorio y admite hasta 100 caracteres.
+- El estado debe pertenecer a los valores permitidos.
+- El identificador debe ser un entero válido.
+- Se rechazan propiedades no permitidas en las solicitudes.
+
+En el frontend se utiliza Zod junto con React Hook Form.
+
+En el backend se utiliza class-validator y el ValidationPipe global de NestJS.
+
+## Pruebas
+
+Se utiliza Vitest para ejecutar las pruebas automatizadas.
+
+### Backend
+
+Incluye pruebas unitarias del servicio y pruebas de integración E2E de la API.
+
+Ejecutar las pruebas unitarias:
+
+```bash
+docker compose exec backend npm test
+```
+
+Ejecutar las pruebas E2E:
+
+```bash
+docker compose exec backend npm run test:e2e
+```
+
+### Frontend
+
+Ejecutar las pruebas:
+
+```bash
+docker compose exec frontend npm test
+```
+
+Las pruebas del frontend verifican, entre otros aspectos:
+
+- Validación del formulario.
+- Creación de tareas.
+- Comportamiento del filtro de tareas.

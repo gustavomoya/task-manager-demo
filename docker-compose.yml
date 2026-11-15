@@ -1,3 +1,4 @@
+
 services:
   postgres:
     image: postgres:17-alpine
@@ -16,6 +17,44 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: task-manager-backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_TEST_HOST: postgres
+      DB_TEST_PORT: 5432
+      DB_TEST_USERNAME: ${DB_USERNAME}
+      DB_TEST_PASSWORD: ${DB_PASSWORD}
+      DB_TEST_DATABASE: ${DB_TEST_DATABASE}
+      FRONTEND_URL: ${FRONTEND_URL}
+      PORT: ${PORT}
+    ports:
+      - "${PORT}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: task-manager-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:${PORT}
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
