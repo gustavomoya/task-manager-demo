@@ -1,18 +1,24 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
+import AppHeader from "./components/layout/AppHeader.tsx";
+import {Route, Routes} from "react-router-dom";
+import TasksPage from "./pages/TasksPage.tsx";
+import CreateTaskPage from "./pages/CreateTaskPage.tsx";
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
-      <main className="min-h-screen bg-slate-100 flex items-center justify-center">
-        <h1 className="text-4xl font-bold text-blue-600">
-          Task Manager
-        </h1>
-      </main>
+      <div className="min-h-screen bg-slate-50">
+          <AppHeader/>
+
+          <main className="mx-auto max-w-6xl px-6 py-8">
+              <Routes>
+                  <Route path="/" element={<TasksPage/>}/>
+                  <Route path="/tasks/new" element={<CreateTaskPage/>}/>
+              </Routes>
+          </main>
+      </div>
   )
 }
 
