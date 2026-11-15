@@ -1,11 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import type { Task } from '../types/task';
 import TaskForm from "../components/tasks/TaskForm.tsx";
 
 function CreateTaskPage() {
   const navigate = useNavigate();
 
-  const handleTaskCreated = (task: Task) => {
+  const handleTaskCreated = () => {
     navigate('/');
   };
 

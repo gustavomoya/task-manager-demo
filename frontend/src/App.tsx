@@ -1,12 +1,10 @@
-import { useState } from 'react'
+import {Route, Routes} from "react-router-dom";
 import './App.css'
 import AppHeader from "./components/layout/AppHeader.tsx";
-import {Route, Routes} from "react-router-dom";
 import TasksPage from "./pages/TasksPage.tsx";
 import CreateTaskPage from "./pages/CreateTaskPage.tsx";
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
       <div className="min-h-screen bg-slate-50">

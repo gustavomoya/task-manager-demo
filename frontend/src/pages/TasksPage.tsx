@@ -184,7 +184,7 @@ function TasksPage() {
 
                         <button
                             type="button"
-                            onClick={() => void fetchTasks()}
+                            onClick={handleRetry}
                             className="font-semibold underline"
                         >
                             Retry
