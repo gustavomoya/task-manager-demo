@@ -116,7 +116,7 @@ No es necesario instalar Node.js, PostgreSQL ni las dependencias de las aplicaci
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <REPOSITORY_URL>
+git clone https://github.com/gustavomoya/task-manager-demo.git
 cd task-manager-demo
 ```
 
@@ -280,3 +280,60 @@ Las pruebas del frontend verifican, entre otros aspectos:
 - Validación del formulario.
 - Creación de tareas.
 - Comportamiento del filtro de tareas.
+
+## Qué haría con más tiempo
+
+El proyecto cubre las funcionalidades principales que se definieron para el MVP. Sin embargo, con más tiempo, trabajaría principalmente en los siguientes aspectos.
+
+### Producto y experiencia de usuario
+
+- **Gestión de usuarios:** actualmente, el responsable de una tarea se introduce como texto. Lo mejoraría incorporando usuarios reales, autenticación y roles, de manera que cada tarea pudiera asignarse a un miembro del equipo.
+- **Historial de tareas:** guardaría quién realizó cada cambio y cuándo lo hizo. Esto permitiría consultar la evolución de una tarea y saber quién modificó su estado.
+- **Búsqueda y organización:** permitiría buscar tareas por título o responsable, ordenarlas y navegar por los resultados mediante paginación.
+- **Internacionalización:** prepararía la aplicación para soportar varios idiomas y diferentes preferencias visuales.
+
+### Backend y API
+
+- **Documentación de la API:** incorporaría Swagger/OpenAPI para que otros desarrolladores pudieran conocer y probar los endpoints fácilmente.
+- **Optimización de consultas:** incorporaría búsqueda, filtros y paginación desde el backend, además de revisar los índices según las consultas más frecuentes.
+- **Seguridad:** añadiría autenticación, control de permisos, protección contra solicitudes excesivas y una configuración más restrictiva de CORS.
+- **Reglas de negocio:** definiría qué cambios de estado están permitidos si el funcionamiento del producto necesitara un flujo de trabajo más estricto.
+
+### Pruebas y calidad
+
+- **Ampliar las pruebas del frontend:** cubriría los cambios de estado, los errores de la API, la recuperación ante fallos y los estados de carga y resultados vacíos.
+- **Automatizar las comprobaciones:** incorporaría un pipeline que ejecutara lint, validación de tipos, pruebas y compilación en cada cambio.
+- **CI/CD:** incorporaría un pipeline que ejecutara lint, validación de tipos, pruebas y compilación en cada cambio.
+
+### Infraestructura y operación
+
+- **Separar las migraciones del arranque:** ejecutaría las migraciones mediante un proceso independiente, en lugar de hacerlo como parte del inicio de la API.
+
+## Cómo usé la IA
+
+Durante el desarrollo utilicé principalmente OpenCode como asistente de programación, complementándolo con GitHub Copilot para definir los requisitos, revisar alternativas,
+gilizar algunas tareas de implementación, resolver dudas técnicas y revisar código.
+
+### Qué le pedí
+
+- Una propuesta de modelo de datos para las tareas: tabla, enum de estados, restricciones e índices.
+- Un diagnóstico del repositorio cuando el backend no aparecía correctamente en Git.
+- Una revisión crítica del backend: validaciones, manejo de errores, configuración y pruebas.
+- La revisión del servicio y los tipos del frontend, incluyendo cómo interpretar los errores de la API.
+- Rediseños de interfaz: algunos rediseños en el header, formulario de creación y listado de tareas.
+- Revisión de las pruebas y de los comandos de verificación (lint, build, tests).
+- Ayuda en la configuración de docker para el arranque de la aplicación.
+
+### Qué acepté
+
+- La separación **Controller → Service → Repository**, con DTOs validados por `class-validator` y `ValidationPipe` global.
+- El estado como **enum nativo de PostgreSQL**, con `timestamptz` para las fechas.
+- El manejo de errores del frontend con una clase `ApiError` que conserva el `status` y los `errors` del backend.
+- El `trim` de `title` y `assignee` en el backend, junto con pruebas de límites y campos extra.
+- El rediseño visual y el **select de estado** con actualización optimista y rollback si la API falla.
+
+### Qué corregí o rechacé
+- **Rechacé una máquina de estados como parte del flujo.** El asistente sugirió restringir las transiciones; preferí que cualquier estado válido pueda cambiarse a cualquier otro. Lo dejé anotado como mejora futura, no como regla actual.
+- **Ajustes en las mejoras propuestas en la ui:** cambios visuales de estilos, mensajes, etc.
+- **Revisé y corregí algunas modificaciones realizadas en las pruebas generadas:** evité mocks que solo repetían la implementación, agregué casos de validación y verifiqué que las suites pasaran de verdad.
+
